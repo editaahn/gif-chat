@@ -2,12 +2,12 @@ extends layout
 
 block content
   div F12를 눌러 console 탭과 network 탭을 확인하세요.
+  script(src='/socket.io/socket.io.js')
   script.
-    var webSocket = new WebSocket("ws://localhost:8005"); // 웹소켓 객체 생성. protocol이 http가 아닌 ws
-    webSocket.onopen = function () { // 서버 연결 이벤트 리스너 
-      console.log('서버와 웹소켓 연결 성공!'); 
-    }
-    webSocket.onmessage = function (event) { // 서버로부터 메시지 수신 시 이벤트 리스너
-      console.log(event.data);
-      webSocket.send('클라이언트에서 서버로 답장을 보냅니다');
-    }
+    var socket = io.connect("ws://localhost:8005", { // 웹소켓 객체 생성. protocol이 http가 아닌 ws
+      path: '/socket.io' // 서버의 path 옵션과 일치해야 서버와 연결 가능
+    });
+    socket.on('news', function (data) { // 서버가 보낸 news 이벤트를 받음 
+      console.log(data);
+      socket.emit('reply', 'Hello Node.js'); // 서버의 reply 이벤트리스너로 답장
+    });
