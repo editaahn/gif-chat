@@ -98,4 +98,19 @@ router.delete('/room/:id', async (req, res, next) => { // delete 메서드로 �
   }
 })
 
+router.post("/room/:id/chat", async (req, res, next) => {
+  try {
+    const chat = new Chat({
+      room: req.params.id,
+      user: req.session.color,
+      chat: req.body.chat,
+    });
+    await chat.save();
+    req.app.get("io").of("/chat").to(req.params.id).emit("chat", chat); // /chat 네임스페이스 및 방번호에 있는 소켓 전체에 chat을 보냄
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 module.exports = router;
